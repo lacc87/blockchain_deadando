@@ -46,6 +46,7 @@ class FindBlockThread:
         if not self.__running:
             return
         self.block_found = True
+        valids = []
         valid = 0
         print("New Block found...")
         for node in other_nodes:
@@ -60,20 +61,31 @@ class FindBlockThread:
             data = s.recv(1024 * 128).decode('utf-8')
             print(data)
             valid_json = json.loads(data)
+            valids.append(valid_json)
             if valid_json['valid']:
                 valid = valid + 1
             s.close()
+
         if valid > 2:
             chain.add_new_block(self.block)
-        #else:
-            # choose from block
-            #net_block = Block(block_json['last_valid_block']['prev_hash'], block_json['last_valid_block']['nonce'], block_json['last_valid_block']['index'], block_json['last_valid_block']['tx_root'])
-            #net_block.created_at = block_json['last_valid_block']['created_at']
-            #if chain.validate_new_block(net_block):
-#                chain.add_new_block(net_block)
- #           else:
-  #              # TODO replace chain
-   #             print('__not valid__')
+        else:
+            for v1 in valids:
+                cnt = 0
+                net_block = None
+                for v2 in valids:
+                    if v1['last_valid_block']['prev_hash'] == v2['last_valid_block']['prev_hash'] and v1['last_valid_block']['nonce'] == v2['last_valid_block']['nonce'] and v1['last_valid_block']['created_at'] == v2['last_valid_block']['created_at'] and v1['last_valid_block']['tx_root'] == v2['last_valid_block']['tx_root'] and v1['last_valid_block']['index'] == v2['last_valid_block']['index']:
+                        cnt = cnt + 1
+                    if cnt == 3:
+                        net_block = Block(v1['last_valid_block']['prev_hash'],
+                                          v1['last_valid_block']['nonce'],
+                                          v1['last_valid_block']['index'],
+                                          v1['last_valid_block']['tx_root'])
+                        net_block.created_at = v1['last_valid_block']['created_at']
+            if net_block and chain.validate_new_block(net_block):
+                chain.add_new_block(net_block)
+            else:
+                # TODO replace chain
+                print('__not valid__')
 
 
 findblock = FindBlockThread()
