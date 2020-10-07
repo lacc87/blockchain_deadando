@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  miner:
+    build: ./
+    command: python mine.py
+    volumes:
+      - ./:/usr/src/app
+    env_file:
+      - ./.env.dev
+
