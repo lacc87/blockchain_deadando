@@ -65,6 +65,15 @@ class FindBlockThread:
             s.close()
         if valid > 2:
             chain.add_new_block(self.block)
+        #else:
+            # choose from block
+            #net_block = Block(block_json['last_valid_block']['prev_hash'], block_json['last_valid_block']['nonce'], block_json['last_valid_block']['index'], block_json['last_valid_block']['tx_root'])
+            #net_block.created_at = block_json['last_valid_block']['created_at']
+            #if chain.validate_new_block(net_block):
+#                chain.add_new_block(net_block)
+ #           else:
+  #              # TODO replace chain
+   #             print('__not valid__')
 
 
 findblock = FindBlockThread()
@@ -75,7 +84,7 @@ serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serversocket.bind((socket.gethostname(), 5000))
 serversocket.listen(10)
 
-findblock.create_block(Transaction(0, 1, 1))
+findblock.create_block(Transaction(0, my_name, 1))
 x = threading.Thread(target=findblock.run, args=())
 x.start()
 
@@ -93,23 +102,23 @@ while True:
             net_block.created_at = block_json['created_at']
             print(block_json)
             if chain.validate_new_block(net_block):
-                valid = { 'valid': True }
+                valid = { 'valid': True}
                 clientsocket.sendall(bytes(json.dumps(valid), encoding="utf-8"))
                 print("BLOCK FROM NETWORK IS VALID")
                 findblock.terminate()
                 chain.add_new_block(net_block)
 
                 findblock = FindBlockThread()
-                findblock.create_block(Transaction(0, 1, 1))
+                findblock.create_block(Transaction(0, my_name, 1))
                 x = threading.Thread(target=findblock.run, args=())
                 x.start()
             else:
-                valid = {'valid': False}
+                valid = {'valid': False, 'last_valid_block': json.loads(chain.get_last_block().as_json())}
                 clientsocket.sendall(bytes(json.dumps(valid), encoding="utf-8"))
                 print("BLOCK FROM NETWORK IS NOT VALID")
         if not x.is_alive():
             findblock = FindBlockThread()
-            findblock.create_block(Transaction(0, 1, 1))
+            findblock.create_block(Transaction(0, my_name, 1))
             x = threading.Thread(target=findblock.run, args=())
             x.start()
 
