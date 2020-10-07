@@ -16,11 +16,11 @@ chain = Chain()
 my_ip = socket.gethostbyname(socket.gethostname())
 my_name = ""
 other_nodes = [
-    {"host": "beadando_miner_1", 'ip': ''},
-    {"host": "beadando_miner_2", 'ip': ''},
-    {"host": "beadando_miner_3", 'ip': ''},
-    {"host": "beadando_miner_4", 'ip': ''},
-    {"host": "beadando_miner_5", 'ip': ''}]
+    {"host": "blockchain_deadando_miner_1", 'ip': ''},
+    {"host": "blockchain_deadando_miner_2", 'ip': ''},
+    {"host": "blockchain_deadando_miner_3", 'ip': ''},
+    {"host": "blockchain_deadando_miner_4", 'ip': ''},
+    {"host": "blockchain_deadando_miner_5", 'ip': ''}]
 for n in other_nodes:
     n["ip"] = socket.gethostbyname(n['host'])
     if my_ip == n["ip"]:
